@@ -3,7 +3,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
 
-namespace _01
+namespace _01.Filters
 {
     internal class EnumSchemaFilter : ISchemaFilter
     {

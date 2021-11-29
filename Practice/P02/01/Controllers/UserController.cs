@@ -1,8 +1,10 @@
 ﻿using _01.Enums;
+using _01.Filters;
 using _01.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace _01.Controllers
 {
@@ -34,6 +36,31 @@ namespace _01.Controllers
         }
 
         /// <summary>
+        /// Get users by filter
+        /// </summary>
+        /// <response code="200">Users retrieved</response>
+        /// <response code="500">Oops! Can't lookup your users right now</response>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        [HttpGet("")]
+        [ProducesResponseType(typeof(IEnumerable<User>), 200)]
+        public ActionResult<IEnumerable<User>> Get([FromQuery] UserFilterRequest filter)
+        {
+            var query = Users.Values.AsEnumerable();
+
+            if (filter.Ids.Any())
+                query = query.Where(u => filter.Ids.Contains(u.Id));
+
+            if (filter.Name?.Length > 0)
+                query = query.Where(u => u.Name.StartsWith(filter.Name));
+
+            if (filter.Roles.Any())
+                query = query.Where(u => filter.Roles.Contains(u.Role));
+
+            return Ok(query);
+        }
+
+        /// <summary>
         /// Create user
         /// </summary>
         /// <param name="user"></param>
@@ -50,7 +77,7 @@ namespace _01.Controllers
                 return Conflict(new ApiError { Code = 3, Message = "User already exist" });
 
             Users[user.Id] = user;
-            return Ok();
+            return Ok(user);
         }
 
         /// <summary>
