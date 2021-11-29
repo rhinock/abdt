@@ -1,0 +1,14 @@
+﻿@model _01.Models.AddUserViewModel
+
+<h2>Add user</h2>
+@Html.ValidationSummary()
+<form asp-controller="Home" asp-action="AddUser" method="post">
+    Email: <input asp-for="Email" /> <br />
+    Password: <input asp-for="Password" /> <br />
+    Confirm password: <input asp-for="ConfirmPassword" /> <br />
+    Age: <input asp-for="Age" /> <br />
+    First name: <input asp-for="FirstName" /> <br />
+    Last name: <input asp-for="LastName" /> <br />
+
+    <button type="submit">Register</button>
+</form>
