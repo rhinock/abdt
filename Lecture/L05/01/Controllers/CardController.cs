@@ -1,4 +1,6 @@
-﻿using _01.Entities;
+﻿using _01.Commands;
+using _01.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -11,33 +13,35 @@ namespace _01.Controllers
     public class CardController : ControllerBase
     {
         private readonly AppDbContext context;
+        private readonly IRepository repository;
+        private readonly IMediator mediator;
 
-        public CardController(AppDbContext context)
+        public CardController(
+            AppDbContext context,
+            IRepository repository,
+            IMediator mediator)
         {
             this.context = context;
+            this.repository = repository;
+            this.mediator = mediator;
         }
 
         [HttpPost]
-        public async Task<ActionResult<long>> Create([FromBody]Card card)
+        public async Task<ActionResult<long>> Create([FromBody] Card card)
         {
-            var entry = context.Entry(card);
-            context.Add(card);
-            await context.SaveChangesAsync();
+            await repository.Create(card);
             return card.Id;
         }
 
         [HttpPost("existed/{id}")]
-        public async Task<ActionResult> UpdateExisted([FromBody] Card card, [FromRoute]long id)
+        public async Task<ActionResult> UpdateExisted([FromBody] Card card, [FromRoute] long id)
         {
             card.Id = id;
-            var existed = await context.Cards.FindAsync(id);
-            var entry = context.Entry(existed);
 
-            existed.Name = card.Name;
-            existed.Number = card.Number;
-            existed.PaymentSystem = card.PaymentSystem;
-
-            await context.SaveChangesAsync();
+            await mediator.Send(new UpdateCardCommand
+            {
+                Card = card
+            });
 
             return Ok();
         }
@@ -46,7 +50,7 @@ namespace _01.Controllers
         public async Task<ActionResult> Update([FromBody] Card card, [FromRoute] long id)
         {
             card.Id = id;
-            
+
             context.Update(card);
             await context.SaveChangesAsync();
 

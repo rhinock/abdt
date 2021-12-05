@@ -23,13 +23,20 @@ namespace _01
             {
                 x.HasKey(s => s.Id);
                 x.Property(s => s.AccountNumber).HasMaxLength(30);
+
                 x.HasOne(s => s.Card)
                     .WithOne();
 
                 x.Property(s => s.Data)
-                .HasConversion(
-                    k => JsonSerializer.Serialize(k, null),
-                    k => JsonSerializer.Deserialize<AccountData>(k, null));
+                    .HasConversion(
+                        k => JsonSerializer.Serialize(k, null),
+                        k => JsonSerializer.Deserialize<AccountData>(k, null));
+            });
+
+            modelBuilder.Entity<Card>(x =>
+            {
+                x.HasOne(s => s.Account)
+                    .WithOne(s => s.Card);
             });
         }
     }
