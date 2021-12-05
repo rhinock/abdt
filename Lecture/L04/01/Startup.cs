@@ -1,14 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace _01
 {
@@ -27,6 +22,9 @@ namespace _01
         {
             services.AddDbContext<AppDbContext>(
                 x => x.UseNpgsql(configuration.GetConnectionString("Db")));
+
+            services.AddMvc();
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,13 +37,10 @@ namespace _01
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
-            });
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
+            app.UseEndpoints(enpoints => enpoints.MapControllers());
         }
     }
 }
