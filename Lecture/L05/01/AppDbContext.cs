@@ -1,5 +1,6 @@
 ﻿using _01.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace _01
 {
@@ -24,6 +25,11 @@ namespace _01
                 x.Property(s => s.AccountNumber).HasMaxLength(30);
                 x.HasOne(s => s.Card)
                     .WithOne();
+
+                x.Property(s => s.Data)
+                .HasConversion(
+                    k => JsonSerializer.Serialize(k, null),
+                    k => JsonSerializer.Deserialize<AccountData>(k, null));
             });
         }
     }
